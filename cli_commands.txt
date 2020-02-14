@@ -1,0 +1,6 @@
+sudo npm install -g @angular/cli
+ng new mean-course
+
+npm install --save @angular/material
+ng add @angular/material
+npm install --save @angular/material@8 --save-exact
