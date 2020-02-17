@@ -4,3 +4,10 @@ ng new mean-course
 npm install --save @angular/material
 ng add @angular/material
 npm install --save @angular/material@8 --save-exact
+
+FOR BACKEND (NodeJS):
+node server.js
+npm install --save express
+npm install --save-dev nodemon
+npm run start:server (after adding script "start:server": "nodemon server.js" in package.json )
+npm install --save body-parser
