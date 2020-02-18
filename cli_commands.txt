@@ -8,6 +8,19 @@ npm install --save @angular/material@8 --save-exact
 FOR BACKEND (NodeJS):
 node server.js
 npm install --save express
+
 npm install --save-dev nodemon
 npm run start:server (after adding script "start:server": "nodemon server.js" in package.json )
+npm cache clean --force
+
 npm install --save body-parser
+
+FOR DATABASE (MongoDB):
+npm install mongodb --save
+npm install --save mongoose
+
+mongo "mongodb+srv://cluster0-3o4xe.mongodb.net/test"  --username admin
+use node-angular
+help
+show collections
+db.posts.find()
