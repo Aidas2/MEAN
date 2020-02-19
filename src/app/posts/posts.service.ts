@@ -2,15 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
-import { Post } from "./post.model";
+import { Post } from './post.model';
 
 @Injectable({providedIn: 'root'})
 export class PostsService {
     private posts: Post[] = [];
     private postsUpdated = new Subject<Post[]>();
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient, private router: Router) {}
 
     getPosts() {
         // return [...this.posts]; // not reference, but new array with copied original array (trought spray operator)
@@ -56,6 +57,7 @@ export class PostsService {
                 post.id = id;
                 this.posts.push(post);
                 this.postsUpdated.next([...this.posts]); // emitting event
+                this.router.navigate(['/']);
             });
     }
 
@@ -69,6 +71,7 @@ export class PostsService {
             updatedPostsAfterEditing[oldPostIndex] = post;
             this.posts = updatedPostsAfterEditing;
             this.postsUpdated.next([...this.posts]);
+            this.router.navigate(['/']);
         });
     }
 
