@@ -13,12 +13,15 @@
         </mat-form-field>
         <div>
             <button mat-stroked-button type="button" (click)="filePicker.click()">Pick Image</button>
-            <input type="file" #filePicker>
+            <input type="file" #filePicker (change)="onImagePicked($event)">
+        </div>
+        <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview && form.get('image').valid">
+            <img [src]="imagePreview" [alt]="form.value.title">
         </div>
         <mat-form-field>
             <textarea 
                 matInput 
-                rows="6" 
+                rows="4" 
                 formControlName="content"
                 placeholder="Post content"
             >
@@ -27,7 +30,7 @@
         </mat-form-field>
         <button 
             mat-raised-button
-            color="primary" 
+            color="accent" 
             type="submit"
         >
         Save Post
