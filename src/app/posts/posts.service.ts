@@ -24,7 +24,8 @@ export class PostsService {
                     return {
                         title: post.title,
                         content: post.content,
-                        id: post._id
+                        id: post._id,
+                        imagePath: post.imagePath
                     };
                 });
             }))
@@ -42,7 +43,7 @@ export class PostsService {
 
     getPost(id: string) {
         // return {...this.posts.find(p => p.id === id)};     // copy of object. also not from backend?! also interesting iterration !!!
-        return this.http.get<{ _id: string, title: string, content: string }>(    // getting from backend.
+        return this.http.get<{ _id: string, title: string, content: string, imagePath: string }>(    // getting from backend.
             'http://localhost:3000/api/posts/' + id                           // as Observable (threfore must sunbscribe when using this method)!!!
         );
     }
@@ -54,16 +55,17 @@ export class PostsService {
         postData.append("content", content);
         postData.append("image", image, title);
         this.http
-            .post<{ message: string, postId: string }>(
+            .post<{ message: string, post: Post }>(
                 'http://localhost:3000/api/posts',
                 postData
             )
             .subscribe(responseData => {
                 console.log(responseData.message);
                 const post: Post = {
-                    id: responseData.postId,
+                    id: responseData.post.id,
                     title: title,
-                    content: content };
+                    content: content,
+                    imagePath: responseData.post.id };
                 // const id = responseData.postId;    // becouse at first id is null!!!
                 // post.id = id;
                 this.posts.push(post);
@@ -72,13 +74,33 @@ export class PostsService {
             });
     }
 
-    updatePost(id: string, title: string, content: string) {
-        const post: Post = { id: id, title: title, content: content };
-        this.http.put('http://localhost:3000/api/posts/' + id, post)
+    updatePost(id: string, title: string, content: string, image: File | string) {
+        let postData: Post | FormData;
+        if (typeof(image) === 'object') {
+            postData = new FormData();
+            postData.append("id", id);
+            postData.append("title", title);
+            postData.append("content", content);
+            postData.append("image", image, title);
+        } else {
+            postData = {
+                id: id,
+                title: title,
+                content: content,
+                imagePath: image
+            };
+        }
+        this.http.put('http://localhost:3000/api/posts/' + id, postData)
             .subscribe(response => {
                 // console.log(response);
                 const updatedPostsAfterEditing = [...this.posts];
-                const oldPostIndex = updatedPostsAfterEditing.findIndex(p => p.id === post.id); // interesting iterration !!!
+                const oldPostIndex = updatedPostsAfterEditing.findIndex(p => p.id === id); // interesting iterration !!!
+                const post: Post = {
+                    id: id,
+                    title: title,
+                    content: content,
+                    imagePath: ''
+                };
                 updatedPostsAfterEditing[oldPostIndex] = post;
                 this.posts = updatedPostsAfterEditing;
                 this.postsUpdated.next([...this.posts]);
