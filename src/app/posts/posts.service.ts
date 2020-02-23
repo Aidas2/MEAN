@@ -9,32 +9,40 @@ import { Post } from './post.model';
 @Injectable({ providedIn: 'root' })
 export class PostsService {
     private posts: Post[] = [];
-    private postsUpdated = new Subject<Post[]>();
+    private postsUpdated = new Subject<{ posts: Post[]; postCount: number }>();
 
     constructor(private http: HttpClient, private router: Router) { }
 
-    getPosts() {
+    getPosts(postsPerPage: number, currentPage: number) {
         // return [...this.posts]; // not reference, but new array with copied original array (trought spray operator)
+        const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
         this.http
-            .get<{ message: string, posts: any }>(
-                'http://localhost:3000/api/posts'
+            .get<{ message: string; posts: any; maxPosts: number }>(
+              'http://localhost:3000/api/posts' + queryParams
             )
-            .pipe(map(postData => {        // transforming post (id --> _id)
-                return postData.posts.map(post => {
+            .pipe(                // transforming post (id --> _id)
+            map(postData => {
+                return {
+                  posts: postData.posts.map(post => {
                     return {
-                        title: post.title,
-                        content: post.content,
-                        id: post._id,
-                        imagePath: post.imagePath
+                      title: post.title,
+                      content: post.content,
+                      id: post._id,
+                      imagePath: post.imagePath
                     };
-                });
-            }))
-            .subscribe(transformedPosts => {
-                this.posts = transformedPosts;
-                this.postsUpdated.next([...this.posts]); // emitting event
+                  }),
+                  maxPosts: postData.maxPosts
+                };
+              })
+            )
+            .subscribe(transformedPostData => {
+              this.posts = transformedPostData.posts;
+              this.postsUpdated.next({    // emitting event
+                posts: [...this.posts],
+                postCount: transformedPostData.maxPosts
+              });
             });
-
-    }
+        }
 
     // just getter
     getPostUpdateListener() {
@@ -43,9 +51,12 @@ export class PostsService {
 
     getPost(id: string) {
         // return {...this.posts.find(p => p.id === id)};     // copy of object. also not from backend?! also interesting iterration !!!
-        return this.http.get<{ _id: string, title: string, content: string, imagePath: string }>(    // getting from backend.
-            'http://localhost:3000/api/posts/' + id                           // as Observable (threfore must sunbscribe when using this method)!!!
-        );
+        return this.http.get<{    // getting from backend.
+            _id: string;          // as Observable (threfore must sunbscribe when using this method)!!!
+            title: string;
+            content: string;
+            imagePath: string;
+        }>('http://localhost:3000/api/posts/' + id);
     }
 
     addPost(title: string, content: string, image: File) {
@@ -60,6 +71,7 @@ export class PostsService {
                 postData
             )
             .subscribe(responseData => {
+                /* //not required anymore cos we go to the page where we fetch latest version anyways
                 console.log(responseData.message);
                 const post: Post = {
                     id: responseData.post.id,
@@ -70,6 +82,7 @@ export class PostsService {
                 // post.id = id;
                 this.posts.push(post);
                 this.postsUpdated.next([...this.posts]); // emitting event
+                */
                 this.router.navigate(['/']);
             });
     }
@@ -90,9 +103,11 @@ export class PostsService {
                 imagePath: image
             };
         }
-        this.http.put('http://localhost:3000/api/posts/' + id, postData)
+        this.http
+            .put('http://localhost:3000/api/posts/' + id, postData)
             .subscribe(response => {
-                // console.log(response);
+                /* //not required anymore cos we go to the page where we fetch latest version anyways
+                console.log(response);
                 const updatedPostsAfterEditing = [...this.posts];
                 const oldPostIndex = updatedPostsAfterEditing.findIndex(p => p.id === id); // interesting iterration !!!
                 const post: Post = {
@@ -104,17 +119,22 @@ export class PostsService {
                 updatedPostsAfterEditing[oldPostIndex] = post;
                 this.posts = updatedPostsAfterEditing;
                 this.postsUpdated.next([...this.posts]);
+                */
                 this.router.navigate(['/']);
             });
     }
 
     deletePost(postId: string) {
+        /* before pagination
         this.http.delete('http://localhost:3000/api/posts/' + postId)
             .subscribe(() => {
                 const updatedPostsAfterDeleting = this.posts.filter(post => post.id !== postId);
                 this.posts = updatedPostsAfterDeleting;
                 this.postsUpdated.next([...this.posts]);
             });
+        */
+       return this.http
+           .delete('http://localhost:3000/api/posts/' + postId);
 
     }
 }

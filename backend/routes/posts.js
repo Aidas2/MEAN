@@ -96,14 +96,26 @@ router.get("", (req, res, next) => {
   //     content: "This is coming from the server!"
   //   }
   // ];
-  Post.find()   // this is mongoose
-  .then(documents => {   
-    console.log(documents);
-    res.status(200).json({
-      message: "Posts fetched successfully!",
-      posts: documents
+
+  const pageSize = +req.query.pagesize;   // '+' converts string to number
+  const currentPage = +req.query.page;
+  const postQuery = Post.find();    //Post.find()   // this is mongoose
+  let fetchedPosts;
+  if (pageSize && currentPage) {
+    postQuery.skip(pageSize * (currentPage - 1)).limit(pageSize); //fetching only required part!!!
+  }
+  postQuery
+    .then(documents => {
+      fetchedPosts = documents;
+      return Post.count();
+    })
+    .then(count => {
+      res.status(200).json({
+        message: "Posts fetched successfully!",
+        posts: fetchedPosts,
+        maxPosts: count
+      });
     });
-  });
 });
 
 router.get("/:id", (req, res, next) => {
