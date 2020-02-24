@@ -1,4 +1,5 @@
 To run this app you should start both: backend(nodemon server.js) and frontend (ne serve).
+in windows run 'nodemon server.js' (cos 'npm run server:start' doesn't works)
 
 sudo npm install -g @angular/cli
 ng new mean-course
@@ -21,8 +22,10 @@ npm install --save multer
 FOR DATABASE (MongoDB):
 npm install mongodb --save
 npm install --save mongoose
+npm install --save mongoose-unique-validator
+npm install --save bcryptjs
 
-mongo "mongodb+srv://cluster0-3o4xe.mongodb.net/test"  --username admin
+mongo "mongodb+srv://cluster0-3o4xe.mongodb.net/test"  --username admin     // write in app.js for connecting to db
 use node-angular
 help
 show collections
