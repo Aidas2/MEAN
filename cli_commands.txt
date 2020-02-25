@@ -25,6 +25,7 @@ npm install --save mongoose
 npm install --save mongoose-unique-validator
 npm install --save bcryptjs
 npm install --save jsonwebtoken
+test4@test.com 4444
 
 mongo "mongodb+srv://cluster0-3o4xe.mongodb.net/test"  --username admin     // write in app.js for connecting to db
 use node-angular
