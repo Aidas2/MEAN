@@ -59,6 +59,11 @@ router.post(
         id: createdPost._id
       }
     });
+  })
+  .catch(error => {
+    res.status(500).json({
+      message: "Creating a post failed! This is message from backend file routes/post.js"
+    })
   });
 });
 
@@ -89,6 +94,11 @@ router.put(
     } else {
       res.status(401).json({ message: "Not authorized! Update not successful!" });
     }
+  })
+  .catch(error => {
+    res.status(500).json({
+      message: "Couldn't update post! This is message from backend file routes/post.js"
+    });
   });
 });
 
@@ -124,6 +134,11 @@ router.get("", (req, res, next) => {
         posts: fetchedPosts,
         maxPosts: count
       });
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: "Fetching posts failed! This is message from backend file routes/post.js"
+      });
     });
 });
 
@@ -134,6 +149,11 @@ router.get("/:id", (req, res, next) => {
     } else {
       res.status(404).json({ message: "Post not found!" });
     }
+  })
+  .catch(error => {
+    res.status(500).json({
+      message: "Fetching a posts failed! This is message from backend file routes/post.js"
+    });
   });
 });
 
@@ -146,6 +166,11 @@ router.delete("/:id", checkAuth, (req, res, next) => {
     } else {
       res.status(401).json({ message: "Not authorized! Deletion not successful!" });
     }
+  })
+  .catch(error => {
+    res.status(500).json({
+      message: "Fetching a post failed! This is message from backend file routes/post.js"
+    });
   });
 });
 
