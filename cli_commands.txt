@@ -32,3 +32,5 @@ use node-angular
 help
 show collections
 db.posts.find()
+
+ng build --prod
